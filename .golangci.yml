@@ -1,0 +1,19 @@
+linters-settings:
+  govet:
+    disable-all: true
+    enable:
+      - fieldalignment
+
+linters:
+  disable-all: true
+  enable:
+    - copyloopvar
+    - forbidigo
+    - gocyclo
+    - mnd
+    - gosec
+    - govet
+    - prealloc
+    - gocritic
+    - bodyclose
+    - noctx
