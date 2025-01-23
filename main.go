@@ -74,4 +74,5 @@ func addMiddleware(app *fiber.App) {
 func addV1Route(app *fiber.App) {
 	route := app.Group("/api/jira-clone-api/v1")
 	routers.NewAuthenticate(route).V1()
+	routers.NewWorkspace(route).V1()
 }

@@ -12,6 +12,7 @@ type UtilityService interface {
 	GetContextTimeout(ctx context.Context) (context.Context, context.CancelFunc)
 	GetUserCollection() (coll *mongo.Collection)
 	GetTokenCollection() (coll *mongo.Collection)
+	GetWorkspaceCollection() (coll *mongo.Collection)
 }
 
 type utilityService struct{}
@@ -35,4 +36,8 @@ func (s *utilityService) GetUserCollection() (coll *mongo.Collection) {
 
 func (s *utilityService) GetTokenCollection() (coll *mongo.Collection) {
 	return s.getJiraDB().Collection(new(mongoModels.Token).CollectionName())
+}
+
+func (s *utilityService) GetWorkspaceCollection() (coll *mongo.Collection) {
+	return s.getJiraDB().Collection(new(mongoModels.Workspace).CollectionName())
 }

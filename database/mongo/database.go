@@ -55,7 +55,9 @@ func autoIndexing() {
 	}
 	jiraUserIndex()
 	jiraTokenIndex()
+	jiraWorkspaceIndex()
 }
+
 func jiraUserIndex() {
 	collIndex := utils.GetUserCollection().Indexes()
 	ctxDrop, cancelDrop := utils.GetContextTimeout(context.Background())
@@ -87,5 +89,22 @@ func jiraTokenIndex() {
 		},
 	}); err != nil {
 		logger.Fatal().Err(err).Msg("jiraTokenIndex")
+	}
+}
+
+func jiraWorkspaceIndex() {
+	collIndex := utils.GetWorkspaceCollection().Indexes()
+	ctxDrop, cancelDrop := utils.GetContextTimeout(context.Background())
+	defer cancelDrop()
+	_, _ = collIndex.DropAll(ctxDrop)
+	ctx, cancel := utils.GetContextTimeout(context.Background())
+	defer cancel()
+	if _, err := collIndex.CreateMany(ctx, []mongo.IndexModel{
+		{
+			Keys:    bson.D{{Key: "name", Value: 1}},
+			Options: options.Index().SetUnique(true),
+		},
+	}); err != nil {
+		logger.Fatal().Err(err).Msg("jiraWorkspaceIndex")
 	}
 }
