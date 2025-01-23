@@ -19,6 +19,7 @@ import (
 	respErr "jira-clone-api/common/response/error"
 	"jira-clone-api/database"
 	"jira-clone-api/utilities/jwt"
+	"jira-clone-api/utilities/storage_s3"
 )
 
 var cfg = configure.GetConfig()
@@ -28,6 +29,7 @@ func main() {
 	validator.InitValidateEngine()
 	database.InitDatabase()
 	jwt.New(cfg.TokenPrivateKey, cfg.TokenPublicKey).InitGlobal()
+	storage_s3.New().InitGlobal()
 	app := fiber.New(fiber.Config{
 		ErrorHandler: response.FiberErrorHandler,
 		JSONDecoder:  sonic.Unmarshal,

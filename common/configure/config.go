@@ -19,6 +19,10 @@ type Configuration struct {
 	TokenPrivateKey       string        `env:"TOKEN_PRIVATE_KEY_PATH,file" envDefault:"certs/private.pem" envExpand:"true"`
 	MongoDBJiraUri        string        `env:"MONGODB_JIRA_URI" envDefault:"mongodb://localhost:27017"`
 	MongoDBJiraName       string        `env:"MONGODB_JIRA_NAME" envDefault:"db_jira"`
+	AwsAccessKeyId        string        `env:"AWS_ACCESS_KEY_ID" envDefault:"!change_me!"`
+	AwsSecretAccessKey    string        `env:"AWS_SECRET_ACCESS_KEY" envDefault:"!change_me!"`
+	AwsRegion             string        `env:"AWS_REGION" envDefault:"!change_me!"`
+	AwsEndpoint           string        `env:"AWS_ENDPOINT_URL" envDefault:"!change_me!"`
 	MongoDBRequestTimeout time.Duration `env:"MONGODB_REQUEST_TIMEOUT" envDefault:"3m"`
 	AccessTokenTimeout    time.Duration `env:"ACCESS_TOKEN_TIMEOUT" envDefault:"1h"`
 	RefreshTokenTimeout   time.Duration `env:"REFRESH_TOKEN_TIMEOUT" envDefault:"2h"`
