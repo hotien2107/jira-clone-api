@@ -1,13 +1,8 @@
 package storage_s3
 
 import (
-	"context"
-	"fmt"
-
-	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/credentials"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
 	"jira-clone-api/common/configure"
 	"jira-clone-api/common/logging"
 )
@@ -23,35 +18,18 @@ type Service interface {
 }
 
 type service struct {
-	Client *s3.Client
+	Client *minio.Client
 }
 
 func New() Service {
-	s3Config, err := config.LoadDefaultConfig(context.Background(),
-		config.WithCredentialsProvider(credentials.StaticCredentialsProvider{
-			Value: aws.Credentials{
-				AccessKeyID:     cfg.AwsAccessKeyId,
-				SecretAccessKey: cfg.AwsSecretAccessKey,
-			},
-		}))
-	if err != nil {
-		logger.Fatal().Err(err).Msg("failed to load s3 config")
-	}
-	client := s3.NewFromConfig(s3Config)
-	output, err := client.ListObjectsV2(context.TODO(), &s3.ListObjectsV2Input{
-		Bucket: aws.String("jira"),
+	minioClient, err := minio.New(cfg.S3Endpoint, &minio.Options{
+		Creds: credentials.NewStaticV4(cfg.S3AccessKeyId, cfg.S3SecretAccessKey, ""),
 	})
 	if err != nil {
-		fmt.Println(err)
+		logger.Fatal().Err(err).Msg("Storage S3 init error")
 	}
-
-	fmt.Println("first page results")
-	for _, object := range output.Contents {
-		fmt.Printf("key=%s size=%d", aws.ToString(object.Key), object.Size)
-	}
-
 	return &service{
-		Client: client,
+		Client: minioClient,
 	}
 }
 
