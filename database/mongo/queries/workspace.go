@@ -3,6 +3,7 @@ package queries
 import (
 	"context"
 	"errors"
+	"regexp"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -18,6 +19,8 @@ import (
 type WorkspaceQuery interface {
 	GetById(id primitive.ObjectID, opts ...OptionsQuery) (workspace *models.Workspace, err error)
 	Create(workspace models.Workspace) (newWorkspace *models.Workspace, err error)
+	TotalByNameRegexAndUserId(name string, userId primitive.ObjectID) (int64, error)
+	GetByNameRegexAndUserId(name string, userId primitive.ObjectID, opts ...OptionsQuery) ([]models.Workspace, error)
 }
 
 type workspaceQuery struct {
@@ -67,4 +70,41 @@ func (q *workspaceQuery) Create(data models.Workspace) (workspace *models.Worksp
 	}
 	data.Id = result.InsertedID.(primitive.ObjectID)
 	return &data, nil
+}
+
+func (q *workspaceQuery) TotalByNameRegexAndUserId(name string, userId primitive.ObjectID) (int64, error) {
+	ctx, cancel := timeoutFunc(q.context)
+	defer cancel()
+	total, err := q.collection.CountDocuments(ctx, bson.M{"name": bson.M{"$regex": primitive.Regex{Pattern: regexp.QuoteMeta(name), Options: "i"}}, "user_id": userId})
+	if err != nil {
+		logger.Error().Err(err).Str("function", "TotalByNameRegexAndUserId").Str("functionInline", "q.collection.FinCountDocumentsd").Msg("workspaceQuery")
+		return 0, response.NewError(fiber.StatusInternalServerError)
+	}
+	return total, nil
+}
+
+func (q *workspaceQuery) GetByNameRegexAndUserId(name string, userId primitive.ObjectID, opts ...OptionsQuery) ([]models.Workspace, error) {
+	opt := NewOptions()
+	if len(opts) > 0 {
+		opt = opts[0]
+	}
+	ctx, cancel := timeoutFunc(q.context)
+	defer cancel()
+	var workspaces []models.Workspace
+	optFind := &options.FindOptions{
+		Projection: opt.QueryOnlyField(),
+		Limit:      opt.QueryPaginationLimit(),
+		Skip:       opt.QueryPaginationSkip(),
+		Sort:       opt.QuerySort(),
+	}
+	cursor, err := q.collection.Find(ctx, bson.M{"name": bson.M{"$regex": primitive.Regex{Pattern: regexp.QuoteMeta(name), Options: "i"}}, "user_id": userId}, optFind)
+	if err != nil {
+		logger.Error().Err(err).Str("function", "GetByNameRegexAndUserId").Str("functionInline", "q.collection.Find").Msg("workspaceQuery")
+		return nil, response.NewError(fiber.StatusInternalServerError)
+	}
+	if err = cursor.All(ctx, &workspaces); err != nil {
+		logger.Error().Err(err).Str("function", "GetByNameRegexAndUserId").Str("functionInline", "cursor.All").Msg("workspaceQuery")
+		return nil, response.NewError(fiber.StatusInternalServerError)
+	}
+	return workspaces, nil
 }

@@ -24,4 +24,5 @@ func (r workspace) V1() {
 
 func (r workspace) root() {
 	r.router.Post("/", authMiddleware.AccessToken, r.ctrl.Create)
+	r.router.Get("/", authMiddleware.AccessToken, r.ctrl.Search)
 }
