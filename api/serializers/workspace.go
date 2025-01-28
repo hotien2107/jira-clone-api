@@ -7,7 +7,7 @@ import (
 )
 
 type WorkspaceCreateBodyValidate struct {
-	Name string `json:"name" validate:"required"`
+	Name string `form:"name" validate:"required"`
 }
 
 func (v *WorkspaceCreateBodyValidate) Validate() error {

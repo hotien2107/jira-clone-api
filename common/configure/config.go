@@ -22,7 +22,9 @@ type Configuration struct {
 	S3AccessKeyId         string        `env:"S3_ACCESS_KEY_ID" envDefault:"!change_me!"`
 	S3SecretAccessKey     string        `env:"S3_SECRET_ACCESS_KEY" envDefault:"!change_me!"`
 	S3Region              string        `env:"S3_REGION" envDefault:"!change_me!"`
-	S3Endpoint            string        `env:"S3_ENDPOINT_URL" envDefault:"!change_me!"`
+	S3Endpoint            string        `env:"S3_ENDPOINT_URL" envDefault:"localhost:9000"`
+	S3BucketName          string        `env:"S3_BUCKET_NAME" envDefault:"jira"`
+	S3Prefix              string        `env:"S3_PREFIX" envDefault:"http://localhost:9001/jira"`
 	MongoDBRequestTimeout time.Duration `env:"MONGODB_REQUEST_TIMEOUT" envDefault:"3m"`
 	AccessTokenTimeout    time.Duration `env:"ACCESS_TOKEN_TIMEOUT" envDefault:"1h"`
 	RefreshTokenTimeout   time.Duration `env:"REFRESH_TOKEN_TIMEOUT" envDefault:"2h"`

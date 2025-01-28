@@ -10,6 +10,7 @@ type Workspace struct {
 	CreatedAt time.Time          `bson:"created_at"`
 	UpdatedAt time.Time          `bson:"updated_at"`
 	Name      string             `bson:"name"`
+	ImageName string             `bson:"image_name"`
 	UserId    primitive.ObjectID `bson:"user_id"`
 	Id        primitive.ObjectID `bson:"_id,omitempty"`
 }

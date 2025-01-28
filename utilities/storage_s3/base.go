@@ -1,6 +1,8 @@
 package storage_s3
 
 import (
+	"mime/multipart"
+
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"jira-clone-api/common/configure"
@@ -15,10 +17,12 @@ var (
 
 type Service interface {
 	InitGlobal()
+	UploadObject(file *multipart.FileHeader) error
 }
 
 type service struct {
 	Client *minio.Client
+	Bucket string
 }
 
 func New() Service {
@@ -30,6 +34,7 @@ func New() Service {
 	}
 	return &service{
 		Client: minioClient,
+		Bucket: cfg.S3BucketName,
 	}
 }
 

@@ -1,8 +1,10 @@
 package storage_s3
 
 import (
+	"bytes"
 	"context"
-	"os"
+	"io"
+	"mime/multipart"
 
 	"github.com/minio/minio-go/v7"
 )
@@ -11,12 +13,16 @@ func (s *service) InitGlobal() {
 	global = s
 }
 
-func (s *service) UploadObject(bucketName, objectName string, file *os.File) error {
-	info, err := file.Stat()
+func (s *service) UploadObject(file *multipart.FileHeader) error {
+	f, err := file.Open()
 	if err != nil {
 		return err
 	}
-	_, err = s.Client.PutObject(context.Background(), bucketName, objectName, file, info.Size(), minio.PutObjectOptions{
+	fileContents, err := io.ReadAll(f)
+	if err != nil {
+		return err
+	}
+	_, err = s.Client.PutObject(context.Background(), s.Bucket, file.Filename, bytes.NewReader(fileContents), file.Size, minio.PutObjectOptions{
 		ContentType: "application/octet-stream",
 	})
 	return err
